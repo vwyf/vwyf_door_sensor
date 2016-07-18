@@ -1,4 +1,4 @@
-#N canvas 141 23 928 723 10;
+#N canvas 139 59 928 723 10;
 #X obj 60 399 tgl 30 0 empty empty play 0 -10 0 10 -262144 -1 -1 0
 1;
 #X obj 122 401 vsl 30 90 0 1 0 0 empty empty Volume 0 -10 0 10 -262144
@@ -33,10 +33,10 @@
 #X connect 12 0 10 0;
 #X connect 12 0 11 0;
 #X restore 60 473 pd sound;
-#X obj 213 397 tgl 30 0 empty empty play 0 -10 0 10 -262144 -1 -1 1
+#X obj 213 397 tgl 30 0 empty empty play 0 -10 0 10 -262144 -1 -1 0
 1;
 #X obj 275 399 vsl 30 90 0 1 0 0 empty empty Volume 0 -10 0 10 -262144
--1 -1 8900 1;
+-1 -1 0 1;
 #X floatatom 275 504 5 0 0 2 - - -, f 5;
 #N canvas 803 207 580 447 sound 0;
 #X obj 190 200 readsf~;
@@ -69,10 +69,10 @@
 #X connect 12 0 9 0;
 #X connect 12 0 10 0;
 #X restore 213 471 pd sound;
-#X obj 353 396 tgl 30 0 empty empty play 0 -10 0 10 -262144 -1 -1 1
+#X obj 353 396 tgl 30 0 empty empty play 0 -10 0 10 -262144 -1 -1 0
 1;
 #X obj 415 398 vsl 30 90 0 1 0 0 empty empty Volume 0 -10 0 10 -262144
--1 -1 8900 1;
+-1 -1 0 1;
 #X floatatom 415 503 5 0 0 2 - - -, f 5;
 #N canvas 854 187 450 300 sound 0;
 #X obj 190 200 readsf~;
@@ -111,14 +111,14 @@
 #X text 102 307 threshold;
 #X floatatom 213 279 5 0 0 0 - - -, f 5;
 #X obj 213 305 <= 1;
-#X obj 213 338 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 213 338 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X text 255 306 threshold;
 #X obj 353 304 <= 1;
-#X obj 353 337 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+#X obj 353 337 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
 1;
 #X text 395 305 threshold;
-#N canvas 531 83 699 518 rpi-communication 0;
+#N canvas 195 112 699 518 rpi-communication 1;
 #X obj 95 218 netreceive 3000;
 #X obj 95 286 print here;
 #X floatatom 190 333 5 0 0 0 - - -, f 5;
@@ -133,7 +133,7 @@
 #X floatatom 95 87 10 0 0 1 port_number - -, f 10;
 #X obj 95 171 list trim;
 #X obj 230 200 print port;
-#X obj 190 286 route 0 17 23;
+#X obj 190 286 route 0 1 23;
 #X connect 0 0 1 0;
 #X connect 0 0 14 0;
 #X connect 2 0 5 0;
