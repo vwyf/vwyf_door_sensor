@@ -5,6 +5,7 @@ sPin = 17 # GPIO17 - sensor
 lPin = 27 # GPIO27 - led
 
 pewpew = True
+hassock = False
 
 # pin setup
 GPIO.setmode(GPIO.BCM) # Broadcom pin-numbering scheme
@@ -12,10 +13,15 @@ GPIO.setup(sPin, GPIO.IN)
 GPIO.setup(lPin, GPIO.OUT)
 
 try:
-	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	server_address = ('localhost', 3000)
-	print 'conneting to localhost:3000'
-	sock.connect(server_address)
+	while not hassock:
+		try:
+			sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			server_address = ('localhost', 3000)
+			print 'conneting to localhost:3000'
+			sock.connect(server_address)
+			hassock = True
+		except socket.error, e:
+			print(e)
 	while 1:
 		if GPIO.input(sPin): # button is released
 			print("pew pew")
