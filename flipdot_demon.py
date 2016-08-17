@@ -143,16 +143,20 @@ n = 0
          
 with serial.Serial("/dev/ttyUSB0", 9600) as srl:
 
+    srl.write(all_bright)
+    time.sleep(0.5)
+
+    srl.write(all_dark)
+    time.sleep(0.5)
+
     while True:
 
-        srl.write(all_bright)
+        show_number(1, n, srl)
         time.sleep(0.5)
 
-        srl.write(all_dark)
-        time.sleep(0.5)
-
-        show_number(1, 0, srl)
-        time.sleep(0.5)
+        n = n + 1
+        if n > 99:
+            n = 0
 
 
 
