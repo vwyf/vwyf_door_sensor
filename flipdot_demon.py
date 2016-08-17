@@ -1,23 +1,4 @@
-### TMS Hyperloop display
-### increase of 2 x 2  pos XY5 counter as a result of passing a car
-### 
-### Arduino Due
-### rs485 brakout 
-### connections:
-### Breakout - Arduino
-### GND  -   GND 
-### RTS  -   3V3
-###TX-O  -   not connected
-###RX-I  -   TX (pin 1 digital)
-###3-5V  -   5V
-### radar switch#1
-### between  pin 3 and GND
-### radar switch@2
-### between pin4 and GND
-###
-### deboucing of a trigger button every  5s
-### dipswitches settings of the lsb controller
-### 3 positions: speed of communication:
+### flipdot display
 ###
 ### 0:1200
 ### 1:2400
@@ -29,21 +10,6 @@
 ### 7: 9600
 ### 8: 9600
 ###
-### 5 positions: order.
-### digit 1: 1
-### digit 2: 2
-### digit 3: 3
-### ... etc digit 9: 9
-##
-### switch#1 is shown on digit 1 and 2 / switch #2 is shown on digit 3 and 4
-##
-##
-##
-##
-### pin 2 digital connected through 10kohm res to 5V and through a radar to GND - Interrupt 0 is on DIGITAL PIN 2!
-### pin 3 digitial connected though 10 kohm res to 5V and through a radar to GND - Interr 1 is on digital pin 3
-##
-##
 ### 0x80 beginning 
 ###___________________
 ### 0x81 - 112 bytes / no refresh / C+3E
@@ -54,29 +20,57 @@
 ### 0x86 - 56 bytes of data / no refresh / C+E
 ### ---------------------------------------
 ### address or 0xFF for all
-### data ... 1 to nuber of data buytes
+### data ... 1 to number of data buytes
 ### 0x8F end
 
 import serial
 import time
 
-### do we need to do this with usb board???
-# volatile int state = LOW;      # The input state toggle
+SCROLL_PAUSE = 0.1
+PANEL_WIDTH = 28
+question_string = "VOTE EARLY VOTE OFTEN -"
 
-numbers = bytearray([
-    62,   65,  65,  62,  0, # 0
-    0,   66,  127, 64,  0,  # 1
-    98,   81,  73,  70,  0, # 2
-    34,   65,  73,  54,  0, # 3
-    56,   36,  34, 127, 32, # 4
-    79,   73,  73,  49,  0, # 5
-    62,   73,  73,  50,  0, # 6
-    3,    1,   1, 127,  0,  # 7
-    54,   73,  73,  54,  0, # 8
-    38,   73,  73,  62,  0, # 9
-    24,  126, 126,  24,  0, # +
-    24,   24,  24,  24,  0  # -
-])
+font = {
+    ' ': bytearray([0]),
+    '+': bytearray([24,  126, 126,  24,  0]),
+    '-': bytearray([24,   24,  24,  24,  0]),
+    '0': bytearray([62,   65,  65,  62,  0]),
+    '1': bytearray([0,   66,  127, 64,  0]),
+    '2': bytearray([98,   81,  73,  70,  0]),
+    '3': bytearray([34,   65,  73,  54,  0]),
+    '4': bytearray([56,   36,  34, 127, 32]),
+    '5': bytearray([79,   73,  73,  49,  0]),
+    '6': bytearray([62,   73,  73,  50,  0]),
+    '7': bytearray([3,    1,   1, 127,  0]),
+    '8': bytearray([54,   73,  73,  54,  0]),
+    '9': bytearray([38,   73,  73,  62,  0]),
+    'A': bytearray([0x3C, 0x0A, 0x0A, 0x3C]),
+    'B': bytearray([0x3E,0x2A,0x2A,0x14]),
+    'C': bytearray([0x1C,0x22,0x22,0x14]),
+    'D': bytearray([0x3E,0x22,0x22,0x1C]),
+    'E': bytearray([0x3E,0x2A,0x2A]),
+    'F': bytearray([0x3E,0x0A,0x0A]),
+    'G': bytearray([0x1C,0x22,0x2A,0x2A]),
+    'H': bytearray([0x3E,0x08,0x08,0x3E]),
+    'I': bytearray([0x3E]),
+    'J': bytearray([0x10,0x20,0x20,0x1E]),
+    'K': bytearray([0x3E, 0x08, 0x14, 0x22]),
+    'L': bytearray([0x3E,0x20,0x20]),
+    'M': bytearray([0x3E,0x04,0x08,0x04]),
+    'N': bytearray([0x3E,0x04,0x08,0x3E]),
+    'O': bytearray([0x1C,0x22,0x22,0x1C]),
+    'P': bytearray([0x3E,0x0A,0x0A,0x1C,0x04]),
+    'Q': bytearray([0x1C,0x22,0x12,0x2C]),
+    'R': bytearray([0x3E,0x0A,0x1A,0x24]),
+    'S': bytearray([0x24,0x2A,0x2A,0x12]),
+    'T': bytearray([0x02,0x02,0x3E,0x02,0x02]),
+    'U': bytearray([0x1E,0x20,0x20,0x1E]),
+    'V': bytearray([0x06,0x18,0x20,0x18,0x6]),
+    'W': bytearray([0x1E,0x20,0x1E,0x20,0x1E]),
+    'X': bytearray([0x36,0x08,0x08,0x36]),
+    'Y': bytearray([0x2E,0x28,0x28,0x1E]),
+    'Z': bytearray([0x32,0x2A,0x2A,0x26])
+}
 
 transmission = bytearray([
     0x80, #header
@@ -111,35 +105,32 @@ all_dark = bytearray([
     0x8F # EOT
 ])
 
-
-def show_number(panel_address, number_to_show, srl): # byte, int
-
-    cyfra1 = 0;
-    cyfra2 = 0;
-
-    cyfra1 = number_to_show / 10
-    cyfra2 = number_to_show - (cyfra1 * 10)
-
-
-    transmission[2] = panel_address;
-    for t in range(0, 5):
-        transmission[10+3+t] = numbers[(cyfra1*5)+t]
+def show_slice(panel_address, t, srl, question):
+    transmission = bytearray([
+        0x80, #header
+        0x83, # 28 bytes, refresh
+        panel_address, # address
+    ])
+    
+    for i in range(t, t + 28): # 28 bytes data
+        transmission.append(question[i%len(question)])
         
-    for t in range(0, 5):
-        transmission[15+3+t]= numbers[(cyfra2*5)+t];
-
-    for t in range(0, 5):
-        transmission[3+t]= numbers[((9+panel_address)*5)+t]; # +
+    transmission.append(0x8F) # EOT
 
     srl.write(transmission)
-    
-#int pin1 = 2;
-#int pin2 = 3;
 
-counter1 = 0x00
-counter2 = 0x00
+# loop over question string and add columns to question
+question = bytearray()
+for c in question_string:
+    if c in font:
+        question.extend(font[c])
+        question.append(0) # put space between letters
 
-n = 0
+# if question is fewer than 28 columns pad it out with spaces
+while len(question) < PANEL_WIDTH:
+    question.extend(font[' '])
+
+t = 0
          
 with serial.Serial("/dev/ttyUSB0", 9600) as srl:
 
@@ -151,33 +142,9 @@ with serial.Serial("/dev/ttyUSB0", 9600) as srl:
 
     while True:
 
-        show_number(1, n, srl)
-        time.sleep(0.5)
+        show_slice(1, t, srl, question)
+        time.sleep(SCROLL_PAUSE)
 
-        n = n + 1
-        if n > 99:
-            n = 0
-
-
-
-##
-##                  
-##                  
-##void setup() {
-##
-##Serial.begin(57600);  
-##
-##Serial.write(all_bright,32); 
-##delay (250);
-##Serial.write(all_dark,32); 
-##delay (250);
-##
-##attachInterrupt(0, my_interrupt_handler1, LOW);
-##attachInterrupt(1, my_interrupt_handler2, LOW);
-##
-##show_number(1,counter1);
-##show_number(2,counter2);
-##
-##}
-##
-
+        t = t + 1
+        if t >= len(question):
+            t = 0
