@@ -28,7 +28,13 @@ import time
 
 SCROLL_PAUSE = 0.1
 PANEL_WIDTH = 28
+DISPLAY_WIDTH = PANEL_WIDTH * 4
 question_string = "VOTE EARLY VOTE OFTEN -"
+
+DISPLAYS = [
+    [1, 2, 3, 4],
+    [5, 6, 7, 8]
+]
 
 font = {
     ' ': bytearray([0]),
@@ -105,6 +111,25 @@ all_dark = bytearray([
     0x8F # EOT
 ])
 
+def display_slice(t, srl, question):
+    i in range(4):
+        start = t + (i * PANEL_WIDTH)
+
+        transmission = bytearray([
+            0x80, #header
+            0x83, # 28 bytes, refresh
+            DISPLAYS[0][i], # address
+        ])
+
+        for j in range(start, start + PANEL_WIDTH):
+            transmission.append(question[j%len(question)])
+
+        transmission.append(0x8F) # EOT
+
+        srl.write(transmission)
+        transmission[2] = DISPLAYS[1][i]
+        srl.write(transmission)
+
 def show_slice(panel_address, t, srl, question):
     transmission = bytearray([
         0x80, #header
@@ -126,8 +151,8 @@ for c in question_string:
         question.extend(font[c])
         question.append(0) # put space between letters
 
-# if question is fewer than 28 columns pad it out with spaces
-while len(question) < PANEL_WIDTH:
+# if question is fewer than total columns pad it out with spaces
+while len(question) < DISPLAY_WIDTH:
     question.extend(font[' '])
 
 t = 0
@@ -142,7 +167,7 @@ with serial.Serial("/dev/ttyUSB0", 9600) as srl:
 
     while True:
 
-        show_slice(1, t, srl, question)
+        display_slice(t, srl, question)
         time.sleep(SCROLL_PAUSE)
 
         t = t + 1
