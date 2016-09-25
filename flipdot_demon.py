@@ -112,7 +112,7 @@ all_dark = bytearray([
 ])
 
 def display_slice(t, srl, question):
-    i in range(4):
+    for i in range(4):
         start = t + (i * PANEL_WIDTH)
 
         transmission = bytearray([
@@ -157,7 +157,7 @@ while len(question) < DISPLAY_WIDTH:
 
 t = 0
          
-with serial.Serial("/dev/ttyUSB0", 9600) as srl:
+with serial.Serial("/dev/ttyUSB0", 57600) as srl:
 
     srl.write(all_bright)
     time.sleep(0.5)
