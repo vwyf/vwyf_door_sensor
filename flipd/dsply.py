@@ -5,6 +5,11 @@ from frm import Frm
 
 class Dsply:
 
+    @staticmethod
+    def WIPE(srl, white):
+        """wipe all displays"""
+        srl.write(Frm(white=white))
+
     def __init__(adrss):
         self.adrss = [int(a) for a in adrss]
         self.lft = lft # a is on left

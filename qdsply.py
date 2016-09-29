@@ -1,11 +1,9 @@
 from __future__ import division
 
-import serial
-import time
 from flipd.dsply import Dsply
 from flipd.dotbf import Dotbf
 
-class Qdmn:
+class Qdsply:
 
     def __init__():
 
@@ -53,7 +51,8 @@ class Qdmn:
             self.qscroll = self.qbf.wdth - self.lftd.wdth
 
 
-    def vote(self, a=True, dpth=10):
+    def vote(self, a, ratio, dpth=10): # a -> bool, true if vote is for a
         """add depth to a or b vote buzzer"""
 
-
+    def wipe(self, srl, white=True):
+        Dsply.WIPE(srl, white)

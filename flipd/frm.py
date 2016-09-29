@@ -3,7 +3,7 @@ class Frm:
     WDTH = 28
     HGHT = 7
 
-    def __init__(self, adrs=0xff):
+    def __init__(self, adrs=0xff, white=False):
         self.b = bytearray([
             0x80,  # header
             0x83,  # 28 bytes refresh
@@ -14,6 +14,9 @@ class Frm:
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
             0x8F # EOT
         ])
+
+        if white:
+            self.b[3:31] = [0xff] * 28
 
     def __setitem__(self, i, b):
         self.b[i+3] = b
