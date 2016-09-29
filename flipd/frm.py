@@ -1,12 +1,13 @@
-class Frame:
+class Frm:
 
-    def __init__(self, ad=0xff):
-        self.wdth = 28
-        self.hght = 7
+    WDTH = 28
+    HGHT = 7
+
+    def __init__(self, adrs=0xff):
         self.b = bytearray([
             0x80,  # header
             0x83,  # 28 bytes refresh
-            int(ad), # address
+            int(adrs), # sanity check address
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, # 28 bytes data
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,

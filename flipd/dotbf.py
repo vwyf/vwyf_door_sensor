@@ -1,14 +1,14 @@
 import math
 import numpy as np
 
-import font
+from fnt import XU
 
-class Dotbuf:
+class Dotbf:
 
-    def __init__(self, wdth=28, hght=7, txt=None, fnt=font.XU):
+    def __init__(self, wdth=28, hght=7, txt=None, fnt=XU):
 
         if txt is not None:
-            a = self._textarray(txt, font)
+            a = self._txtarray(txt, font)
 
             self.wdth = len(a)
             self.hght = 7
@@ -34,21 +34,22 @@ class Dotbuf:
         y %= self.hght
         return self._b[y, x]
 
-    def writedotbuf(self, othr, ox, oy, x, y, wdth, hght):
-        othr._b[oy:oy+hght, ox:ox+wdth] = self._b[y:y+hght, x:x+wdth]
+    def writebf(self, obf, ox, oy, x=0, y=0, wdth=-1, hght=-1):
+        if wdth < 0:
+            wdth = self.wdth
+        if hght < 0:
+            hght = self.hght
+        obf._b[oy:oy+hght, ox:ox+wdth] = self._b[y:y+hght, x:x+wdth]
 
-    def writeframe(self, frm, x, y):
-        for i, x in enumerate(range(x, x + frm.wdth)):
+    def writefrm(self, frm, x, y):
+        for i, nx in enumerate(range(x, x + frm.wdth)):
             clmn = 0
-            for i, y in enumerate(range(y, y + frm.hght)):
-                if self[x, y]:
+            for i, ny in enumerate(range(y, y + frm.hght)):
+                if self[nx, ny]:
                     clmn |= 0x1 << j
             frm[i] = clmn
 
-    def invert(self):
-        self._b.invert()
-
-    def _textarray(self, txt, fnt):
+    def _txtarray(self, txt, fnt):
         
         a = bytearray([0])
         for c in txt:
