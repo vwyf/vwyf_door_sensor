@@ -16,7 +16,7 @@ class Dsply:
         self.wdth = Frm.WDTH * len(self.adrss)
         self.hght = Frm.HGHT # panel height
     
-    def render(srl, bf, x, y): # render from given buffer at given origin
+    def render(srl, bf, x=0, y=0): # render from given buffer at given origin
 
         for i, adrs in enumerate(self.adrss):
             f = Frm(adrs)

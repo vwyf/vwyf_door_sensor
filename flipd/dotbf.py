@@ -49,6 +49,16 @@ class Dotbf:
                     clmn |= 0x1 << j
             frm[i] = clmn
 
+    def flipmask(self, obf, ox, oy, x=0, y=0, wdth=-1, hght=-1):
+        if wdth < 0:
+            wdth = self.wdth
+        if hght < 0:
+            hght = self.hght
+        for u in range(x, x+wdth):
+            for v in range(y, y+hght):
+                if self[u, v]:
+                    obf[u, v] = ~obf[u, v]        
+
     def _txtarray(self, txt, fnt):
         
         a = bytearray([0])
